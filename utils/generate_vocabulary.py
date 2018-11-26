@@ -1,3 +1,7 @@
+unknown_words = 'UNKN\n'
+padding_term = 'PADD\n'
+
+
 def load_training_data():
   infile = open('../data/dev.txt', 'r')
   data = infile.readlines()
@@ -21,6 +25,7 @@ def generate_vocabulary_and_tag_files(training_data):
       if tag not in training_tags_list:
         training_tags_list.append(tag)
         training_tags_string += tag + '\n'
+  training_words_string += unknown_words + padding_term
   return training_words_string, training_tags_string
 
 
