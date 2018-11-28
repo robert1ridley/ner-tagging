@@ -159,8 +159,8 @@ def main():
   word_dict = generate_vocab_dictionary(word_list)
   tag_dict = generate_tag_dictionary(tag_list)
 
-  # model = BiLSTM(len(word_list), tag_dict, EMBEDDING_DIM, HIDDEN_DIM)
-  # optimizer = torch.optim.SGD(model.parameters(), lr=0.01, weight_decay=1e-4)
+  model = BiLSTM(len(word_list), tag_dict, EMBEDDING_DIM, HIDDEN_DIM)
+  optimizer = torch.optim.SGD(model.parameters(), lr=0.01, weight_decay=1e-4)
 
   data = load_file('../data/dev.txt')
   training_data = get_training_data(data)
