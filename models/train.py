@@ -98,7 +98,7 @@ class BiLSTM(torch.nn.Module):
       best_tag_id = bptrs_t[best_tag_id]
       best_path.append(best_tag_id)
     start = best_path.pop()
-    assert start == self.tag_to_ix[START_SYMBOL]  # Sanity check
+    assert start == self.tag_to_ix[START_SYMBOL]
     best_path.reverse()
     return path_score, best_path
 
