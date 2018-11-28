@@ -43,12 +43,17 @@ def get_training_data(training_data):
 
 
 def get_pairs(training_data):
+  START = '*'
+  STOP = "STOP"
+  start_seq = (START, START)
+  stop_seq = (STOP, STOP)
   pairs = []
   for sentence in training_data:
-    single_sentence = []
+    single_sentence = [start_seq, start_seq]
     for word in sentence.strip().split():
       splits = word.rsplit('/', 1)
       single_sentence.append((splits[0], splits[1]))
+    single_sentence.append(stop_seq)
     pairs.append(single_sentence)
   return pairs
 
