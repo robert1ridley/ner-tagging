@@ -42,6 +42,17 @@ def get_training_data(training_data):
   return full_data
 
 
+def get_pairs(training_data):
+  pairs = []
+  for sentence in training_data:
+    single_sentence = []
+    for word in sentence.strip().split():
+      splits = word.rsplit('/', 1)
+      single_sentence.append((splits[0], splits[1]))
+    pairs.append(single_sentence)
+  return pairs
+
+
 def load_file(filepath):
   infile = open(filepath, 'r')
   data = infile.readlines()

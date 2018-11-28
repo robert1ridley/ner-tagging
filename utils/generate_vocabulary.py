@@ -2,7 +2,7 @@ START_SYMBOL = '*\n'
 STOP_SYMBOL = 'STOP\n'
 
 def load_training_data():
-  infile = open('../data/dev.txt', 'r')
+  infile = open('../data/train.txt', 'r')
   data = infile.readlines()
   infile.close()
   return data

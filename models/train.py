@@ -4,8 +4,8 @@ from utils import calc_arg_max, compute_log_sum_expectation, prepare_sequence, \
 
 START_SYMBOL = '*'
 STOP_SYMBOL = 'STOP'
-EMBEDDING_DIM = 5
-HIDDEN_DIM = 4
+EMBEDDING_DIM = 32
+HIDDEN_DIM = 32
 
 class BiLSTM(torch.nn.Module):
 
@@ -124,26 +124,28 @@ def main():
   optimizer = torch.optim.SGD(model.parameters(), lr=0.01, weight_decay=1e-4)
   data = load_file('../data/dev.txt')
   training_data = get_training_data(data)
-  training_data = training_data[:10]
+  training_data = training_data[:3]
   with torch.no_grad():
-    precheck_sent = prepare_sequence(training_data[5][0], word_dict)
+    precheck_sent = prepare_sequence(training_data[0][0], word_dict)
     precheck_tags = torch.tensor([tag_dict[t] for t in training_data[0][1]], dtype=torch.long)
     print(model(precheck_sent))
 
   for epoch in range(
-    50):
+    10):
     print(epoch)
     for sentence, tags in training_data:
       model.zero_grad()
       sentence_in = prepare_sequence(sentence, word_dict)
       targets = torch.tensor([tag_dict[t] for t in tags], dtype=torch.long)
+      print(targets)
       loss = model.neg_log_likelihood(sentence_in, targets)
       loss.backward()
       optimizer.step()
 
   with torch.no_grad():
-    precheck_sent = prepare_sequence(training_data[5][0], word_dict)
-    print(model(precheck_sent))
+    precheck_sent = prepare_sequence(training_data[0][0], word_dict)
+    tag_scores = model(precheck_sent)
+    print(tag_scores)
 
 
 if __name__ == "__main__":
