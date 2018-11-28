@@ -4,20 +4,20 @@ from nltk import bigrams, trigrams
 
 class Hmm(object):
 
-    def __init__(self):
-        pass
+  def __init__(self):
+    pass
 
 
 def calculate_emissions(sentences):
-    emission_count = {}
-    term = 'ONEGRAM '
-    for sentence in sentences[:500]:
-        for pair in sentence:
-            if term + pair[0] + ' ' + pair[1] not in emission_count.keys():
-                emission_count[term + pair[0] + ' ' + pair[1]] = 1
-            else:
-                emission_count[term + pair[0] + ' ' + pair[1]] += 1
-    return emission_count
+  emission_count = {}
+  term = 'ONEGRAM '
+  for sentence in sentences[:500]:
+    for pair in sentence:
+      if term + pair[0] + ' ' + pair[1] not in emission_count.keys():
+        emission_count[term + pair[0] + ' ' + pair[1]] = 1
+      else:
+        emission_count[term + pair[0] + ' ' + pair[1]] += 1
+  return emission_count
 
 
 def calc_bigram_emissions(sequence_sets):
@@ -47,13 +47,13 @@ def calc_trigram_emissions(sequence_sets):
 
 
 def get_tag_seqs(sentences):
-    sets = []
-    for sentence in sentences:
-        tags = []
-        for pair in sentence:
-            tags.append(pair[1])
-        sets.append(tags)
-    return sets
+  sets = []
+  for sentence in sentences:
+    tags = []
+    for pair in sentence:
+      tags.append(pair[1])
+    sets.append(tags)
+  return sets
 
 
 def write_emissions_to_text(_words, _bigrams, _trigrams, pathname):
@@ -98,7 +98,7 @@ def calculate_emission_probabilities(emission_counts, tag_counts):
       term = datum[1]
       tag = datum[2]
       emission_count = int(datum[3])
-      score = emission_count/tag_count_dict[tag]
+      score = emission_count / tag_count_dict[tag]
       scores[term + ' ' + tag] = score
   return scores
 
@@ -127,15 +127,47 @@ def start_count_emission_probabilities(EMISSION_COUNT_FILE, TAG_COUNTS, EMISSION
   write_emission_probabilities_to_text(emission_probabilities, EMISSION_PROBABILITIES)
 
 
+def calculate_transition_probabilities(EMISSION_COUNT_FILE):
+  emission_count_data = load_file(EMISSION_COUNT_FILE)
+  scores = {}
+  bigram_dict = {}
+  for datum in emission_count_data:
+    datum = datum.strip().split()
+    if datum[0] == 'BIGRAM':
+      bigram_dict[datum[1] + ' ' + datum[2]] = int(datum[3])
+    elif datum[0] == 'TRIGRAM':
+      tag1 = datum[1]
+      tag2 = datum[2]
+      tag3 = datum[3]
+      trigram_count = int(datum[4])
+      score = trigram_count/bigram_dict[datum[1] + ' ' + datum[2]]
+      scores[datum[3] + ' | ' + datum[1] + ' ' + datum[2]] = score
+  return scores
+
+
+def write_transition_probabilities_to_text(transition_probabilities, pathname):
+  text = ''
+  for key in transition_probabilities:
+    text += key + ' ' + str(transition_probabilities[key]) + '\n'
+  with open(pathname, "w") as f:
+    f.write(text)
+
+
+def start_count_transition_probabilities(EMISSION_COUNT_FILE, TRANSITION_PROBABILITIES):
+  # SCORES ARE RETURNED IN THE FORM (y | y-2, y-1)
+  transition_probabilities = calculate_transition_probabilities(EMISSION_COUNT_FILE)
+  write_transition_probabilities_to_text(transition_probabilities, TRANSITION_PROBABILITIES)
+
+
 def main():
   EMISSION_COUNT_FILE = '../data/emission_counts.txt'
   EMISSION_PROBABILITIES = '../data/emission_probabilities.txt'
+  TRANSITION_PROBABILITIES = '../data/transition_probabilities.txt'
   TRAINING_FILE = '../data/train.txt'
   TAG_COUNTS = '../data/tag_counts.txt'
 
-  start_count_emission_probabilities(EMISSION_COUNT_FILE, TAG_COUNTS, EMISSION_PROBABILITIES)
-
+  start_count_transition_probabilities(EMISSION_COUNT_FILE, TRANSITION_PROBABILITIES)
 
 
 if __name__ == '__main__':
-    main()
+  main()
