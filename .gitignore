@@ -8,3 +8,5 @@ __pycache__
 tags.txt
 vocabulary.txt
 emission_counts.txt
+emission_probabilities.txt
+tag_counts.txt

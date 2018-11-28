@@ -1,6 +1,7 @@
 from utils import get_pairs, load_file
 from nltk import bigrams, trigrams
 
+
 class Hmm(object):
 
     def __init__(self):
@@ -67,14 +68,73 @@ def write_emissions_to_text(_words, _bigrams, _trigrams, pathname):
     f.write(text)
 
 
+def write_tag_counts_to_text(tag_seqs, pathname):
+  tags = {}
+  tag_string = ''
+  for sentence in tag_seqs:
+    for tag in sentence:
+      if tag not in tags:
+        tags[tag] = 1
+      else:
+        tags[tag] += 1
+  for key in tags:
+    tag_string += key + ' ' + str(tags[key]) + '\n'
+  with open(pathname, "w") as f:
+    f.write(tag_string)
+
+
+def calculate_emission_probabilities(emission_counts, tag_counts):
+  emission_count_data = load_file(emission_counts)
+  tag_count_data = load_file(tag_counts)
+  tag_count_dict = {}
+  for tag_set in tag_count_data:
+    tag_set = tag_set.strip().split()
+    tag_count_dict[tag_set[0]] = int(tag_set[1])
+
+  scores = {}
+  for datum in emission_count_data:
+    datum = datum.strip().split()
+    if datum[0] == 'ONEGRAM':
+      term = datum[1]
+      tag = datum[2]
+      emission_count = int(datum[3])
+      score = emission_count/tag_count_dict[tag]
+      scores[term + ' ' + tag] = score
+  return scores
+
+
+def write_emission_probabilities_to_text(emission_dict, pathname):
+  text = ''
+  for key in emission_dict:
+    text += key + ' ' + str(emission_dict[key]) + '\n'
+  with open(pathname, "w") as f:
+    f.write(text)
+
+
+def calculate_and_write_emmision_counts(TRAINING_FILE, EMISSION_COUNT_FILE, TAG_COUNTS):
+  data = load_file(TRAINING_FILE)
+  sentences = get_pairs(data)
+  tag_seqs = get_tag_seqs(sentences)
+  onegram_emissions = calculate_emissions(sentences)
+  bigram_emissions = calc_bigram_emissions(tag_seqs)
+  trigram_emissions = calc_trigram_emissions(tag_seqs)
+  write_emissions_to_text(onegram_emissions, bigram_emissions, trigram_emissions, EMISSION_COUNT_FILE)
+  write_tag_counts_to_text(tag_seqs, TAG_COUNTS)
+
+
+def start_count_emission_probabilities(EMISSION_COUNT_FILE, TAG_COUNTS, EMISSION_PROBABILITIES):
+  emission_probabilities = calculate_emission_probabilities(EMISSION_COUNT_FILE, TAG_COUNTS)
+  write_emission_probabilities_to_text(emission_probabilities, EMISSION_PROBABILITIES)
+
+
 def main():
-    data = load_file('../data/train.txt')
-    sentences = get_pairs(data)
-    tag_seqs = get_tag_seqs(sentences)
-    onegram_emissions = calculate_emissions(sentences)
-    bigram_emissions = calc_bigram_emissions(tag_seqs)
-    trigram_emissions = calc_trigram_emissions(tag_seqs)
-    write_emissions_to_text(onegram_emissions, bigram_emissions, trigram_emissions, '../data/emission_counts.txt')
+  EMISSION_COUNT_FILE = '../data/emission_counts.txt'
+  EMISSION_PROBABILITIES = '../data/emission_probabilities.txt'
+  TRAINING_FILE = '../data/train.txt'
+  TAG_COUNTS = '../data/tag_counts.txt'
+
+  start_count_emission_probabilities(EMISSION_COUNT_FILE, TAG_COUNTS, EMISSION_PROBABILITIES)
+
 
 
 if __name__ == '__main__':
