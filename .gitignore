@@ -2,5 +2,7 @@
 
 venv/
 
+__pycache__
+
 tags.txt
 vocabulary.txt

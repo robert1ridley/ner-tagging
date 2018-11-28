@@ -29,6 +29,26 @@ def generate_tag_dictionary(tags):
   return tag_dictionary
 
 
+def get_training_data(training_data):
+  full_data = []
+  for sentence in training_data:
+    current_sentence_words = []
+    current_sentence_tags = []
+    for word in sentence.strip().split():
+      splits = word.rsplit('/', 1)
+      current_sentence_words.append(splits[0])
+      current_sentence_tags.append(splits[1])
+    full_data.append((current_sentence_words, current_sentence_tags))
+  return full_data
+
+
+def load_file(filepath):
+  infile = open(filepath, 'r')
+  data = infile.readlines()
+  infile.close()
+  return data
+
+
 def main():
   vocabulary, tags = load_vocabulary_and_tags('../data/')
   vocabulary_dictionary = generate_vocab_dictionary(vocabulary)
