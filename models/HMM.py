@@ -8,6 +8,10 @@ class Hmm(object):
     pass
 
 
+def viterbi(observations, states, initial_probs, trans_prob, emit_prob):
+  pass
+
+
 def calculate_emissions(sentences):
   emission_count = {}
   term = 'ONEGRAM '
@@ -159,15 +163,87 @@ def start_count_transition_probabilities(EMISSION_COUNT_FILE, TRANSITION_PROBABI
   write_transition_probabilities_to_text(transition_probabilities, TRANSITION_PROBABILITIES)
 
 
+def get_states(pathname):
+  states = load_file(pathname)
+  state_list = []
+  for state in states:
+    state_list.append(state.strip())
+  return state_list
+
+
+def get_observations(pathname):
+  observations = load_file(pathname)
+  observation_list = []
+  for observation in observations:
+    observation = observation.strip().split()
+    gram = observation[0]
+    word = observation[1]
+    if gram == 'ONEGRAM' and word not in observation_list:
+      observation_list.append(word)
+  return observation_list
+
+
+def get_initial_probs(pathname):
+  emissions = load_file(pathname)
+  counts = {}
+  probs = {}
+  for emission in emissions:
+    split = emission.strip().split()
+    if split[0] == 'TRIGRAM' and split[1] == '*' and split[2] == '*':
+      counts[split[3]] = int(split[4])
+  total = sum(counts.values())
+  for item in counts:
+    probs[item] = counts[item]/total
+  return probs
+
+
+def get_emission_probabilities(pathname):
+  emission_probs = load_file(pathname)
+  emission_probs_dict = {}
+  for emission in emission_probs:
+    emission = emission.strip().split()
+    word = emission[0]
+    tag = emission[1]
+    probability = emission[2]
+    if tag not in emission_probs_dict.keys():
+      inner_dict = {}
+      inner_dict[word] = probability
+      emission_probs_dict[tag] = inner_dict
+    else:
+      emission_probs_dict[tag][word] = probability
+  return emission_probs_dict
+
+
+def get_transition_probabilities(pathname):
+  transition_probs = load_file(pathname)
+  transition_probs_dict = {}
+  for transition in transition_probs:
+    inter = transition.strip().split('|')
+    final_state = inter[0].strip()
+    bigram_and_prob = inter[1].split()
+    key = (bigram_and_prob[0], bigram_and_prob[1], final_state)
+    transition_probs_dict[key] = bigram_and_prob[2]
+  return transition_probs_dict
+
+
 def main():
   EMISSION_COUNT_FILE = '../data/emission_counts.txt'
   EMISSION_PROBABILITIES = '../data/emission_probabilities.txt'
   TRANSITION_PROBABILITIES = '../data/transition_probabilities.txt'
   TRAINING_FILE = '../data/train.txt'
   TAG_COUNTS = '../data/tag_counts.txt'
+  TAGS = '../data/tags.txt'
 
-
+  # calculate_and_write_emmision_counts(TRAINING_FILE, EMISSION_COUNT_FILE, TAG_COUNTS)
+  # start_count_emission_probabilities(EMISSION_COUNT_FILE, TAG_COUNTS, EMISSION_PROBABILITIES)
   # start_count_transition_probabilities(EMISSION_COUNT_FILE, TRANSITION_PROBABILITIES)
+  states = get_states(TAGS)
+  # observations = get_observations(EMISSION_COUNT_FILE)
+  emission_probabilities = get_emission_probabilities(EMISSION_PROBABILITIES)
+  transition_probabilities = get_transition_probabilities(TRANSITION_PROBABILITIES)
+  initial_prob = get_initial_probs(EMISSION_COUNT_FILE)
+  obs = ['人民日报', '是', '一家', '公司']
+  # viterbi(obs, states, initial_prob, transition_probabilities, emission_probabilities)
 
 
 if __name__ == '__main__':
