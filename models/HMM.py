@@ -1,5 +1,7 @@
 from utils import get_pairs, load_file
 from nltk import bigrams, trigrams
+from collections import defaultdict
+import math
 
 
 class Hmm(object):
@@ -8,8 +10,6 @@ class Hmm(object):
     pass
 
 
-def viterbi(observations, states, initial_probs, trans_prob, emit_prob):
-  pass
 
 
 def calculate_emissions(sentences):
@@ -21,7 +21,23 @@ def calculate_emissions(sentences):
         emission_count[term + pair[0] + ' ' + pair[1]] = 1
       else:
         emission_count[term + pair[0] + ' ' + pair[1]] += 1
-  return emission_count
+
+  new_dict = emission_count.copy()
+  for emission in emission_count.keys():
+    split = emission.strip().split()
+    term = split[0]
+    word = split[1]
+    tag = split[2]
+    if new_dict[emission] < 5:
+      if term + ' ' + '_RARE_' + ' ' + tag not in new_dict.keys():
+        new_dict[term + ' ' + '_RARE_' + ' ' + tag] = new_dict[emission]
+      else:
+        new_dict[term + ' ' + '_RARE_' + ' ' + tag] += new_dict[emission]
+  final_dict = {}
+  for k, v in new_dict.items():
+    if not v < 5:
+      final_dict[k] = v
+  return final_dict
 
 
 def calc_bigram_emissions(sequence_sets):
@@ -226,6 +242,17 @@ def get_transition_probabilities(pathname):
   return transition_probs_dict
 
 
+def get_words(pathname):
+  file_data = load_file(pathname)
+  d = defaultdict(int)
+  for l in file_data:
+    line = l.strip().split()
+    if line[0] == 'ONEGRAM':
+      word = line[1]
+      d[word] = line[3]
+  return d
+
+
 def main():
   EMISSION_COUNT_FILE = '../data/emission_counts.txt'
   EMISSION_PROBABILITIES = '../data/emission_probabilities.txt'
@@ -237,13 +264,17 @@ def main():
   # calculate_and_write_emmision_counts(TRAINING_FILE, EMISSION_COUNT_FILE, TAG_COUNTS)
   # start_count_emission_probabilities(EMISSION_COUNT_FILE, TAG_COUNTS, EMISSION_PROBABILITIES)
   # start_count_transition_probabilities(EMISSION_COUNT_FILE, TRANSITION_PROBABILITIES)
-  states = get_states(TAGS)
-  # observations = get_observations(EMISSION_COUNT_FILE)
+  # words = get_words(EMISSION_COUNT_FILE)
+  # states = get_states(TAGS)
+
+  # EMIS = {{'O': '他': '0.0030924176793756647', ...}, {I-ORG: ...}}
   emission_probabilities = get_emission_probabilities(EMISSION_PROBABILITIES)
+  print(emission_probabilities)
+
+  # TRANS = {('*', '*', '0'): 0.643242, ...}
   transition_probabilities = get_transition_probabilities(TRANSITION_PROBABILITIES)
-  initial_prob = get_initial_probs(EMISSION_COUNT_FILE)
-  obs = ['人民日报', '是', '一家', '公司']
-  # viterbi(obs, states, initial_prob, transition_probabilities, emission_probabilities)
+  obs = ['中国', '是', '一个', '国家']
+  viterbi(sentence, transition_probabilities, emission_probabilities)
 
 
 if __name__ == '__main__':
