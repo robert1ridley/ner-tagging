@@ -10,6 +10,10 @@ class Hmm(object):
     pass
 
 
+def viterbi(sentence, transition, emission):
+  for position in sentence:
+
+
 
 
 def calculate_emissions(sentences):
@@ -274,7 +278,7 @@ def main():
   # TRANS = {('*', '*', '0'): 0.643242, ...}
   transition_probabilities = get_transition_probabilities(TRANSITION_PROBABILITIES)
   obs = ['中国', '是', '一个', '国家']
-  viterbi(sentence, transition_probabilities, emission_probabilities)
+  viterbi(obs, transition_probabilities, emission_probabilities)
 
 
 if __name__ == '__main__':
