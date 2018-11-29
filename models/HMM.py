@@ -11,7 +11,7 @@ class Hmm(object):
 def calculate_emissions(sentences):
   emission_count = {}
   term = 'ONEGRAM '
-  for sentence in sentences[:500]:
+  for sentence in sentences:
     for pair in sentence:
       if term + pair[0] + ' ' + pair[1] not in emission_count.keys():
         emission_count[term + pair[0] + ' ' + pair[1]] = 1
@@ -140,8 +140,8 @@ def calculate_transition_probabilities(EMISSION_COUNT_FILE):
       tag2 = datum[2]
       tag3 = datum[3]
       trigram_count = int(datum[4])
-      score = trigram_count/bigram_dict[datum[1] + ' ' + datum[2]]
-      scores[datum[3] + ' | ' + datum[1] + ' ' + datum[2]] = score
+      score = trigram_count/bigram_dict[tag1 + ' ' + tag2]
+      scores[tag3 + ' | ' + tag1 + ' ' + tag2] = score
   return scores
 
 
@@ -166,7 +166,8 @@ def main():
   TRAINING_FILE = '../data/train.txt'
   TAG_COUNTS = '../data/tag_counts.txt'
 
-  start_count_transition_probabilities(EMISSION_COUNT_FILE, TRANSITION_PROBABILITIES)
+
+  # start_count_transition_probabilities(EMISSION_COUNT_FILE, TRANSITION_PROBABILITIES)
 
 
 if __name__ == '__main__':
