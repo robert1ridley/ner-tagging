@@ -1,2 +1,5 @@
+nltk==3.4
 numpy==1.15.4
+singledispatch==3.4.0.3
+six==1.11.0
 torch==0.4.1
