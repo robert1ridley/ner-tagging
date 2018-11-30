@@ -15,6 +15,21 @@ def load_dev_data():
   return data
 
 
+def load_test_data():
+  infile = open('../data/test.content.txt', 'r')
+  data = infile.readlines()
+  infile.close()
+  return data
+
+
+def get_test_data_sets(data):
+  sets = []
+  for line in data:
+    set = line.strip().split()
+    sets.append(set)
+  return sets
+
+
 def get_dev_words_and_tags(data):
   words = []
   tags = []

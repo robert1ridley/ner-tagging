@@ -1,6 +1,8 @@
-from utils import get_pairs, load_file, load_dev_data, get_dev_words_and_tags
+from utils import get_pairs, load_file, load_dev_data, get_dev_words_and_tags, load_test_data, get_test_data_sets
 from nltk import bigrams, trigrams
 from collections import defaultdict
+from sklearn.metrics import f1_score
+from sklearn.preprocessing import MultiLabelBinarizer
 
 
 def is_in_emissions_dict(word, emissions_dict):
@@ -340,14 +342,58 @@ def main():
 
   # TRANS = {('*', '*', '0'): 0.643242, ...}
   transition_probabilities = get_transition_probabilities(TRANSITION_PROBABILITIES)
+
+  # ==========================================================================
+
+  # TEST
+
+  # ==========================================================================
+  # pred_sets = []
+  # test_data = load_test_data()
+  # test_data_sets = get_test_data_sets(test_data)
+  # for set in test_data_sets:
+  #   pred = viterbi(states, set, transition_probabilities, emission_probabilities)
+  #   pred_sets.append(pred)
+  #
+  # pred_string = ''
+  # for predict in pred_sets:
+  #   joined_string = ' '.join(predict)
+  #   pred_string += joined_string + '\n'
+  #
+  #
+  # with open('../data/prediction_final.txt', "w") as f:
+  #   f.write(pred_string)
+
+  # ==========================================================================
+
+  # DEV
+
+  # ==========================================================================
   tags_sets = []
   dev_data = load_dev_data()
-  word_obs, tags = get_dev_words_and_tags(dev_data)
+  word_obs, dev_tags = get_dev_words_and_tags(dev_data)
   for obs in word_obs:
     predicted_tags = viterbi(states, obs, transition_probabilities, emission_probabilities)
     tags_sets.append(predicted_tags)
-    print(predicted_tags)
 
+  correct = 0
+  incorrect = 0
+  set_count = 0
+  for set in tags_sets:
+    tag_count = 0
+    for tag in set:
+      if tag == dev_tags[set_count][tag_count]:
+        correct += 1
+      else:
+        incorrect += 1
+      tag_count += 1
+    set_count += 1
+  print("ACCURACy: ")
+  print(correct/(correct+incorrect))
+  new_preds = MultiLabelBinarizer().fit_transform(tags_sets)
+  true_tags = MultiLabelBinarizer().fit_transform(dev_tags)
+  score = f1_score(true_tags, new_preds, average="micro")
+  print(score)
 
 if __name__ == '__main__':
   main()
