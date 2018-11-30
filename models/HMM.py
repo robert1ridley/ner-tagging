@@ -22,7 +22,7 @@ def viterbi(states, sentence, transition, emission):
   initial_word = sentence[index]
   word_in_dict = is_in_emissions_dict(initial_word, emission)
   if not word_in_dict:
-    initial_word == '_RARE_'
+    initial_word = '_RARE_'
   for item in transition:
     if item[0] == '*' and item[1] == '*':
       current_tag = item[2]
@@ -41,14 +41,15 @@ def viterbi(states, sentence, transition, emission):
       tag2 = item[0][2]
       word_in_dict = is_in_emissions_dict(current_word, emission)
       if not word_in_dict:
-        current_word == '_RARE_'
+        current_word = '_RARE_'
       for tran in transition:
         if tran[0] == tag1 and tran[1] == tag2:
           current_tag = tran[2]
-          if current_word in emission[current_tag].keys():
-            probability = float(emission[current_tag][current_word]) * float(transition[tran])
-            if (tran, probability) not in paths[-1]:
-              paths[-1].append((tran, probability))
+          if current_tag in emission.keys():
+            if current_word in emission[current_tag].keys():
+              probability = float(emission[current_tag][current_word]) * float(transition[tran])
+              if (tran, probability) not in paths[-1]:
+                paths[-1].append((tran, probability))
     index += 1
   rev = paths[::-1]
   for path in rev:
@@ -334,7 +335,7 @@ def main():
 
   # TRANS = {('*', '*', '0'): 0.643242, ...}
   transition_probabilities = get_transition_probabilities(TRANSITION_PROBABILITIES)
-  obs = ['中国', '是', '一个', '国家']
+  obs = ['习近平', '是', '我的', '朋友']
   viterbi(states, obs, transition_probabilities, emission_probabilities)
 
 
