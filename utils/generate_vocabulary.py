@@ -1,25 +1,7 @@
+from utils import load_file
+
 START_SYMBOL = '*\n'
 STOP_SYMBOL = 'STOP\n'
-
-def load_training_data():
-  infile = open('../data/train.txt', 'r')
-  data = infile.readlines()
-  infile.close()
-  return data
-
-
-def load_dev_data():
-  infile = open('../data/dev.txt', 'r')
-  data = infile.readlines()
-  infile.close()
-  return data
-
-
-def load_test_data():
-  infile = open('../data/test.content.txt', 'r')
-  data = infile.readlines()
-  infile.close()
-  return data
 
 
 def get_test_data_sets(data):
@@ -76,7 +58,9 @@ def write_vocab_and_tags_to_txt(data_path, vocab, tags):
 
 
 def main():
-  training_data = load_training_data()
+  TRAINING_DATA = '../data/train.txt'
+
+  training_data = load_file(TRAINING_DATA)
   vocabulary_list, tag_list = generate_vocabulary_and_tag_files(training_data)
   write_vocab_and_tags_to_txt('../data', vocabulary_list, tag_list)
 

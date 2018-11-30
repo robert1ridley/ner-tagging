@@ -65,6 +65,14 @@ def load_file(filepath):
   return data
 
 
+def get_states(pathname):
+  states = load_file(pathname)
+  state_list = []
+  for state in states:
+    state_list.append(state.strip())
+  return state_list
+
+
 def main():
   vocabulary, tags = load_vocabulary_and_tags('../data/')
   vocabulary_dictionary = generate_vocab_dictionary(vocabulary)
