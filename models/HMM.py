@@ -4,15 +4,58 @@ from collections import defaultdict
 import math
 
 
-class Hmm(object):
+def is_in_emissions_dict(word, emissions_dict):
+  for k, v in emissions_dict.items():
+    if word in v.keys():
+      return True
+  return False
 
-  def __init__(self):
-    pass
 
+def viterbi(states, sentence, transition, emission):
+  sentence.insert(0, '*')
+  sentence.insert(0, '*')
+  sentence.append('STOP')
+  paths = [[]]
 
-def viterbi(sentence, transition, emission):
-  for position in sentence:
+  # Calc initial paths
+  index = 2
+  initial_word = sentence[index]
+  word_in_dict = is_in_emissions_dict(initial_word, emission)
+  if not word_in_dict:
+    initial_word == '_RARE_'
+  for item in transition:
+    if item[0] == '*' and item[1] == '*':
+      current_tag = item[2]
+      if initial_word in emission[current_tag].keys():
+        probability = float(emission[current_tag][initial_word]) * float(transition[item])
+        paths[0].append((item, probability))
+  index += 1
 
+  # Calc remaining paths
+  while index < len(sentence):
+    current_word = sentence[index]
+    prev_instances = paths[-1]
+    paths.append([])
+    for item in prev_instances:
+      tag1 = item[0][1]
+      tag2 = item[0][2]
+      word_in_dict = is_in_emissions_dict(current_word, emission)
+      if not word_in_dict:
+        current_word == '_RARE_'
+      for tran in transition:
+        if tran[0] == tag1 and tran[1] == tag2:
+          current_tag = tran[2]
+          if current_word in emission[current_tag].keys():
+            probability = float(emission[current_tag][current_word]) * float(transition[tran])
+            paths[-1].append((tran, probability))
+    index += 1
+
+  # Backwards calc
+  path_options = []
+  final_index = len(paths) - 1
+
+  # while final_index >= 0:
+  #   pass
 
 
 
@@ -269,16 +312,15 @@ def main():
   # start_count_emission_probabilities(EMISSION_COUNT_FILE, TAG_COUNTS, EMISSION_PROBABILITIES)
   # start_count_transition_probabilities(EMISSION_COUNT_FILE, TRANSITION_PROBABILITIES)
   # words = get_words(EMISSION_COUNT_FILE)
-  # states = get_states(TAGS)
+  states = get_states(TAGS)
 
   # EMIS = {{'O': '他': '0.0030924176793756647', ...}, {I-ORG: ...}}
   emission_probabilities = get_emission_probabilities(EMISSION_PROBABILITIES)
-  print(emission_probabilities)
 
   # TRANS = {('*', '*', '0'): 0.643242, ...}
   transition_probabilities = get_transition_probabilities(TRANSITION_PROBABILITIES)
   obs = ['中国', '是', '一个', '国家']
-  viterbi(obs, transition_probabilities, emission_probabilities)
+  viterbi(states, obs, transition_probabilities, emission_probabilities)
 
 
 if __name__ == '__main__':
