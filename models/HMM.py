@@ -38,8 +38,11 @@ def viterbi(states, sentence, transition, emission):
     prev_instances = paths[-1]
     paths.append([])
     for item in prev_instances:
+      max_prob = -100
+      best_set = ()
       tag1 = item[0][1]
       tag2 = item[0][2]
+      prob = item[1]
       word_in_dict = is_in_emissions_dict(current_word, emission)
       if not word_in_dict:
         current_word = '_RARE_'
@@ -50,28 +53,27 @@ def viterbi(states, sentence, transition, emission):
             if current_word in emission[current_tag].keys():
               probability = float(emission[current_tag][current_word]) * float(transition[tran])
               if (tran, probability) not in paths[-1]:
-                paths[-1].append((tran, probability))
+                if probability*prob > max_prob*prob:
+                  max_prob = probability
+                  best_set = tran
+      if best_set != ():
+        paths[-1].append((best_set, max_prob))
     index += 1
   rev = paths[::-1]
-  for path in rev:
-    print(path)
+  print(rev)
 
   # Backpointers calc
-  path_options = []
-  final_index = len(paths) - 1
-  for result in paths[final_index]:
-    path_options.append([(result[0][2], result[1])])
-    prev = result[0][1]
-    skip_prev = result[0][0]
-    current_index = final_index - 1
-    while current_index >= -1:
-      for item in paths[current_index]:
-        if item[0][1] == skip_prev and item[0][2] == prev:
-          path_options[-1].append((item[0][2], item[1]))
-          prev = item[0][1]
-          skip_prev = item[0][0]
-        current_index -= 1
-    final_index -= 1
+  # path_options = {}
+  # ind = 0
+  # for set_of_choices in rev:
+  #   for choice in set_of_choices:
+  #     if ind == 0:
+  #       path_options[choice[0]] = {}
+  #     if ind != 0:
+  #       current_tag = choice[0][2]
+  #       prev_tag = choice[0][1]
+  #       for
+  #   ind += 1
   # print(path_options)
 
 
