@@ -69,7 +69,6 @@ def main():
   vocabulary, tags = load_vocabulary_and_tags('../data/')
   vocabulary_dictionary = generate_vocab_dictionary(vocabulary)
   tag_dictionary = generate_tag_dictionary(tags)
-  print(vocabulary_dictionary)
 
 
 if __name__ == '__main__':

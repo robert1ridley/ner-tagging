@@ -1,7 +1,6 @@
-from utils import get_pairs, load_file
+from utils import get_pairs, load_file, load_dev_data, get_dev_words_and_tags
 from nltk import bigrams, trigrams
 from collections import defaultdict
-import math
 
 
 def is_in_emissions_dict(word, emissions_dict):
@@ -34,7 +33,6 @@ def viterbi(states, sentence, transition, emission):
 
   while index < len(sentence):
     current_word = sentence[index]
-    print("RUN")
     point_count = 0
     for point in paths:
       tag1 = point[-1][0][1]
@@ -73,8 +71,12 @@ def viterbi(states, sentence, transition, emission):
     if prob_val > best_prob_val:
       best_prob_val = prob_val
       best_set = path
-  print(best_prob_val)
-  print(best_set)
+
+  final_set = []
+  for item in best_set:
+    tag = item[0][2]
+    final_set.append(tag)
+  return final_set[:-1]
 
 
 
@@ -338,8 +340,13 @@ def main():
 
   # TRANS = {('*', '*', '0'): 0.643242, ...}
   transition_probabilities = get_transition_probabilities(TRANSITION_PROBABILITIES)
-  obs = ['习近平', '是', '我的', '朋友']
-  viterbi(states, obs, transition_probabilities, emission_probabilities)
+  tags_sets = []
+  dev_data = load_dev_data()
+  word_obs, tags = get_dev_words_and_tags(dev_data)
+  for obs in word_obs:
+    predicted_tags = viterbi(states, obs, transition_probabilities, emission_probabilities)
+    tags_sets.append(predicted_tags)
+    print(predicted_tags)
 
 
 if __name__ == '__main__':

@@ -8,6 +8,30 @@ def load_training_data():
   return data
 
 
+def load_dev_data():
+  infile = open('../data/dev.txt', 'r')
+  data = infile.readlines()
+  infile.close()
+  return data
+
+
+def get_dev_words_and_tags(data):
+  words = []
+  tags = []
+  for sentence in data:
+    sentence_words = []
+    sentence_tags = []
+    for word in sentence.strip().split():
+      splits = word.rsplit('/', 1)
+      word = splits[0]
+      tag = splits[1]
+      sentence_words.append(word)
+      sentence_tags.append(tag)
+    words.append(sentence_words)
+    tags.append(sentence_tags)
+  return words, tags
+
+
 def generate_vocabulary_and_tag_files(training_data):
   training_tags_list = []
   training_words_list = []
