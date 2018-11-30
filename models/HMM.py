@@ -26,9 +26,10 @@ def viterbi(states, sentence, transition, emission):
   for item in transition:
     if item[0] == '*' and item[1] == '*':
       current_tag = item[2]
-      if initial_word in emission[current_tag].keys():
-        probability = float(emission[current_tag][initial_word]) * float(transition[item])
-        paths[0].append((item, probability))
+      if current_tag in emission.keys():
+        if initial_word in emission[current_tag].keys():
+          probability = float(emission[current_tag][initial_word]) * float(transition[item])
+          paths[0].append((item, probability))
   index += 1
 
   # Calc remaining paths
