@@ -47,15 +47,30 @@ def viterbi(states, sentence, transition, emission):
           current_tag = tran[2]
           if current_word in emission[current_tag].keys():
             probability = float(emission[current_tag][current_word]) * float(transition[tran])
-            paths[-1].append((tran, probability))
+            if (tran, probability) not in paths[-1]:
+              paths[-1].append((tran, probability))
     index += 1
+  rev = paths[::-1]
+  for path in rev:
+    print(path)
 
-  # Backwards calc
+  # Backpointers calc
   path_options = []
   final_index = len(paths) - 1
-
-  # while final_index >= 0:
-  #   pass
+  for result in paths[final_index]:
+    path_options.append([(result[0][2], result[1])])
+    prev = result[0][1]
+    skip_prev = result[0][0]
+    current_index = final_index - 1
+    while current_index >= -1:
+      for item in paths[current_index]:
+        if item[0][1] == skip_prev and item[0][2] == prev:
+          path_options[-1].append((item[0][2], item[1]))
+          prev = item[0][1]
+          skip_prev = item[0][0]
+        current_index -= 1
+    final_index -= 1
+  # print(path_options)
 
 
 
