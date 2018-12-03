@@ -1,1 +1,1 @@
-from .HMM import viterbi
+from .Viterbi import Viterbi

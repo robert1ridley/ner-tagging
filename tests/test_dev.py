@@ -2,10 +2,12 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 import _pickle
 from models import Viterbi
-from utils import load_file, get_test_data_sets
+from utils import load_file, get_dev_words_and_tags
+from sklearn.metrics import f1_score
+from sklearn.preprocessing import MultiLabelBinarizer
 
 
-class Test_test(object):
+class Dev_test(object):
 
   def __init__(self):
     self.transition_probabilities = {}
@@ -14,6 +16,7 @@ class Test_test(object):
     self.unique_tags = {}
     self.bigram_counts = {}
     self.test_data = None
+    self.actual_tags = []
     self.predicted_tags = []
 
 
@@ -26,8 +29,10 @@ class Test_test(object):
 
 
   def get_data(self, filename):
-    test_data = load_file(filename)
-    word_obs = get_test_data_sets(test_data)
+    dev_data = load_file(filename)
+    word_obs, dev_tags = get_dev_words_and_tags(dev_data)
+    for sent in dev_tags:
+      self.actual_tags.append(sent[2:])
     self.test_data = word_obs
 
 
@@ -37,28 +42,37 @@ class Test_test(object):
     self.predicted_tags = viterbi.calc_viterbi()
 
 
-  def write_to_file(self, output_file):
-    pred_string = ''
-    for predict in self.predicted_tags:
-      predicted_sequence = ' '.join(predict)
-      pred_string += predicted_sequence + '\n'
-
-    with open(output_file, "w") as f:
-      f.write(pred_string)
+  def calc_accuracy(self):
+    correct = 0
+    incorrect = 0
+    set_count = 0
+    for set in self.actual_tags:
+      tag_count = 0
+      for tag in set:
+        if tag == self.predicted_tags[set_count][tag_count]:
+          correct += 1
+        else:
+          incorrect += 1
+        tag_count += 1
+      set_count += 1
+    print("ACCURACY: " + str(correct / (correct + incorrect)))
+    predictions = MultiLabelBinarizer().fit_transform(self.predicted_tags)
+    true_tags = MultiLabelBinarizer().fit_transform(self.actual_tags)
+    score = f1_score(true_tags, predictions, average="micro")
+    print("F1-SCORE: " + str(score))
 
 
 def main():
-  TEST_FILE = './data/test.content.txt'
+  DEV_FILE = './data/dev.txt'
   PROBABILITIES_FILE = './data/probabilities.txt'
-  OUTPUT_FILE = './data/predictions.txt'
 
   with open(PROBABILITIES_FILE, 'rb') as infile:
     probs_dict = _pickle.load(infile)
-  test_test = Test_test()
-  test_test.get_params(probs_dict)
-  test_test.get_data(TEST_FILE)
-  test_test.run_viterbi()
-  test_test.write_to_file(OUTPUT_FILE)
+  dev_test = Dev_test()
+  dev_test.get_params(probs_dict)
+  dev_test.get_data(DEV_FILE)
+  dev_test.run_viterbi()
+  dev_test.calc_accuracy()
 
 
 if __name__ == '__main__':
