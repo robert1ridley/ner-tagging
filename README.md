@@ -19,11 +19,8 @@ After cloning the repository:
     - Install the project dependencies：`pip install –r requirements.txt`
 
 * Start the program:
-    - Ensure that you are inside `ner-tagging` and that your virtual environment is running
-    - Enter `cd utils`
-    - Generate the `vocabulary.txt` and `tags.txt` files: `python generate_vocabulary.py` (this may take a minute or two)
-    - Generate the `emission_counts.txt`, `tag_counts.txt`, `emission_probabilities.txt` and `transition_probabilities.txt`:
-    `python emissions_and_transitions.py`
-    - The necessary files have now been generated. Test the model on the dev.txt set: `cd ../tests` and then run `python dev_test.py`
-    - To generate predictions for the `test.content.txt` data, while in `/tests`, run `python test_test.py`. This will create `prediction_final.txt`
+    - Ensure that you are inside `/ner-tagging` and that your virtual environment is running
+    - Enter `python models/hmm.py`. This will generate a file called `probabilities.txt`
+    - After generating the `probabilities.txt` file, to test the model on the dev.txt set: run `python tests/test_dev.py`. This will output the accuracy and f1-scores for the validation data set.
+    - To generate predictions for the `test.content.txt` data, while in `/ner-tagging`, run `python tests/test_test.py`. This will create `prediction.txt`
     - Deactivate your virtual environment by entering `deactivate`
