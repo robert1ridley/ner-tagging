@@ -42,11 +42,9 @@ class Viterbi(object):
               1.0 / float(self.bigram_counts[(second_ob_tag, first_ob_tag)] + self.no_tags))
           else:
             transition_prob = math.log(1.0 / float(self.no_tags))
-
         if (observations[idx], item) not in self.emission_probabilities:
           transition_prob = 0.0
-          probability = self.calc_backpointers(observations, idx - 1, first_ob_tag) + \
-                        transition_prob
+          probability = self.calc_backpointers(observations, idx - 1, first_ob_tag) + transition_prob
         else:
           probability = self.calc_backpointers(observations, idx - 1, first_ob_tag) + \
                         self.emission_probabilities[(observations[idx], item)] + transition_prob
