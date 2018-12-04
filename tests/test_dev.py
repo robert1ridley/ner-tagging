@@ -46,9 +46,14 @@ class Dev_test(object):
     correct = 0
     incorrect = 0
     set_count = 0
+    labels = []
+    classes = ('O', 'B-LOCATION', 'B-TIME', 'B-PERSON', 'O-PERSON', 'B-ORGANIZATION',
+               'O-ORGANIZATION', 'O-LOCATION', 'I-ORGANIZATION', 'I-LOCATION')
     for set in self.actual_tags:
       tag_count = 0
       for tag in set:
+        if tag not in labels:
+          labels.append(tag)
         if tag == self.predicted_tags[set_count][tag_count]:
           correct += 1
         else:
@@ -56,8 +61,8 @@ class Dev_test(object):
         tag_count += 1
       set_count += 1
     print("ACCURACY: " + str(correct / (correct + incorrect)))
-    predictions = MultiLabelBinarizer().fit_transform(self.predicted_tags)
-    true_tags = MultiLabelBinarizer().fit_transform(self.actual_tags)
+    predictions = MultiLabelBinarizer(classes=classes).fit_transform(self.predicted_tags)
+    true_tags = MultiLabelBinarizer(classes=classes).fit_transform(self.actual_tags)
     score = f1_score(true_tags, predictions, average="micro")
     print("F1-SCORE: " + str(score))
 
