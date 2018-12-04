@@ -2,7 +2,7 @@
 
 This NER tagger uses a trigram hidden-markov language model plus the viterbi algorithm to tag Chinese sentences according to 
 whether they contain named entities, such as the names of people, times, places and businesses. The model achieves 96% accuracy
-and an 84% f1-score on the dev.txt data.
+and an 87% f1-score on the dev.txt data.
 
 ## Requirements
 
