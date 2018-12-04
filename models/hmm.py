@@ -9,7 +9,6 @@ import utils
 def compute_emission_probabilities(word_and_tag_count, tag_occurence_count):
   em_probs = {}
   for word_and_tag, count in word_and_tag_count.items():
-    # TRY THIS WITHOUT LOG
     em_probs[word_and_tag] = log(float(count)/float(tag_occurence_count[word_and_tag[1]]))
   return em_probs
 
@@ -47,7 +46,6 @@ def main():
       else:
         tag_occurence_count[ner_tag] = 1
 
-      # TRY SOMETHING LIKE (sentence[i-1][1], sentence[i][1])
       bigrams = (sentence[i-2][1], sentence[i-1][1])
       if bigrams in bigram_occurence_count:
         bigram_occurence_count[bigrams] += 1
